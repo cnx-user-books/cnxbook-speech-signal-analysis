@@ -1,0 +1,277 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:m="http://www.w3.org/1998/Math/MathML"> 
+  <title>Spectrograms</title>
+
+  <metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m0505</md:content-id>
+  <md:title>Spectrograms</md:title>
+  <md:abstract>Spectrograms visually represent the speach signal, and the
+calculation of the Spectrogram is briefly explained.</md:abstract>
+  <md:uuid>e1744717-b8c5-4e28-80e0-9e0c4ee8389c</md:uuid>
+</metadata>
+
+<content>
+    <para id="p1">We know how to acquire analog signals for digital processing
+      (<link document="m0050" strength="2">pre-filtering</link>, <link document="m0050" strength="2">sampling</link>, and <link document="m0051" strength="2">A/D conversion</link>) and to compute spectra of
+      discrete-time signals (using the <link document="m10250" strength="2">FFT algorithm</link>), let's put these various
+      components together to learn how the spectrogram shown in <link target-id="spectrogram" strength="2"/>, which is used to <link document="m0049" strength="2">analyze speech</link>, is
+      calculated. The speech was sampled at a rate of 11.025 kHz
+      and passed through a 16-bit A/D converter.  <note id="id7026635" type="point of       interest"><label>Point of interest</label>Music compact discs (CDs) encode their signals at a
+      sampling rate of 44.1 kHz.  We'll learn the rationale for this
+      number later.  The 11.025 kHz sampling rate for the speech is
+      1/4 of the CD sampling rate, and was the lowest available
+      sampling rate commensurate with speech signal bandwidths
+      available on my computer.</note>
+    </para>
+
+    <exercise id="exer1">
+      <problem id="id7026652">
+	<para id="p6">
+	  Looking at <link target-id="spectrogram" strength="2"/> the
+          signal lasted a little over 1.2 seconds.  How long was the
+          sampled signal (in terms of samples)?  What was the datarate
+          during the sampling process in bps (bits per second)?
+          Assuming the computer storage is organized in terms of bytes
+          (8-bit quantities), how many bytes of computer memory does
+          the speech consume?
+        </para>
+      </problem>
+      <solution id="id7026673">
+	<para id="p7">
+          Number of samples equals 
+          <m:math>
+	    <m:apply>
+              <m:eq/>
+	      <m:apply>
+		<m:times/>
+		<m:cn>1.2</m:cn>
+		<m:cn>11025</m:cn>
+	      </m:apply>
+	      <m:cn>13230</m:cn>
+	    </m:apply>
+	  </m:math>.  The datarate is
+          <m:math>
+	    <m:apply>
+              <m:eq/>
+	      <m:apply>
+		<m:times/>
+		<m:cn>11025</m:cn>
+		<m:cn>16</m:cn>
+	      </m:apply>
+	      <m:cn>176.4</m:cn>
+	    </m:apply>
+	  </m:math> kbps.  The storage required would be
+	  <m:math><m:cn>26460</m:cn></m:math> bytes.
+        </para>
+      </solution>
+    </exercise>
+
+    <figure id="spectrogram"><title>Speech Spectrogram</title><media id="id7037324" alt="">
+        <image src="../../media/spectrum8.png" mime-type="image/png"/>
+        <image for="pdf" src="../../media/spectrum8.eps" mime-type="application/postscript"/>
+      </media>
+    </figure>
+
+    <para id="p2">The resulting discrete-time signal, shown in the bottom of <link target-id="spectrogram" strength="2"/>, clearly changes its
+      character with time.  To display these spectral changes, the
+      long signal was sectioned into <term>frames</term>:
+      comparatively short, contiguous groups of samples.
+      Conceptually, a Fourier transform of each frame is calculated
+      using the FFT.  Each frame is not so long that significant
+      signal variations are retained within a frame, but not so short
+      that we lose the signal's spectral character. Roughly speaking, the speech signal's spectrum is evaluated over successive time segments and stacked side by side so that the <m:math><m:ci>x</m:ci></m:math>-axis corresponds to time and the <m:math><m:ci>y</m:ci></m:math>-axis frequency, with color indicating the spectral amplitude.
+    </para>
+
+    <para id="p3">
+      An important detail emerges when we examine each framed signal
+      (<link target-id="fig2" strength="2"/>).
+    <figure id="fig2">
+      <title>Spectrogram Hanning vs. Rectangular</title>
+      <media id="id7084276" alt="">
+        <image src="../../media/sig18.png" mime-type="image/png"/>
+        <image for="pdf" src="../../media/sig18.eps" mime-type="application/postscript"/>
+      </media>
+      <caption>
+	The top waveform is a segment 1024 samples long taken from the
+	beginning of the "Rice University" phrase.  Computing <link target-id="spectrogram" strength="2"/> involved creating frames,
+	here demarked by the vertical lines, that were 256 samples
+	long and finding the spectrum of each.  If a rectangular
+	window is applied (corresponding to extracting a frame from
+	the signal), oscillations appear in the spectrum (middle of
+	bottom row).  Applying a Hanning window gracefully tapers the
+	signal toward frame edges, thereby yielding a more accurate
+	computation of the signal's spectrum at that moment of time.
+      </caption>
+    </figure>
+    At the frame's edges, the
+      signal may change very abruptly, a feature not present in the
+      original signal.  A transform of such a segment reveals a
+      curious oscillation in the spectrum, an artifact directly
+      related to this sharp amplitude change.  A better way to frame
+      signals for spectrograms is to apply a <term>window</term>:
+      Shape the signal values within a frame so that the signal decays
+      gracefully as it nears the edges.  This shaping is accomplished
+      by multiplying the framed signal by the sequence
+      <m:math>
+	<m:apply>
+          <m:ci type="fn">w</m:ci>
+          <m:ci>n</m:ci>
+        </m:apply>
+      </m:math>.  In sectioning the signal, we essentially applied a
+      rectangular window:
+      <m:math>
+	 <m:apply><m:eq/>
+	    <m:apply><m:ci type="fn">w</m:ci>
+	      <m:ci>n</m:ci>
+	    </m:apply>
+	    <m:cn>1</m:cn>
+	 </m:apply>
+      </m:math>,
+      <m:math>
+        <m:apply><m:leq/>
+         <m:cn>0</m:cn>
+         <m:ci>n</m:ci>
+         <m:apply><m:minus/><m:ci>N</m:ci><m:cn>1</m:cn></m:apply>
+        </m:apply>
+      </m:math>.  A much more graceful window is the <term>Hanning
+      window</term>; it has the cosine shape
+      <m:math>
+	<m:apply>
+          <m:eq/>
+	  <m:apply>
+	    <m:ci type="fn">w</m:ci>
+	    <m:ci>n</m:ci>
+	  </m:apply>
+	  <m:apply>
+	    <m:times/>
+	    <m:apply><m:divide/> 
+	      <m:cn>1</m:cn>
+	      <m:cn>2</m:cn>
+	    </m:apply>
+	    <m:apply>
+	      <m:minus/>
+	      <m:cn>1</m:cn>
+	      <m:apply><m:cos/>
+		<m:apply><m:divide/>
+                   <m:apply><m:times/>
+		    <m:cn>2</m:cn>
+		    <m:pi/>
+		    <m:ci>n</m:ci>
+		   </m:apply>
+		   <m:ci>N</m:ci>
+		</m:apply>
+	      </m:apply>
+	    </m:apply>
+	  </m:apply>
+        </m:apply>
+      </m:math>.  As shown in <link target-id="fig2" strength="2"/>, this
+      shaping greatly reduces spurious oscillations in each frame's
+      spectrum.  Considering the spectrum of the Hanning windowed
+      frame, we find that the oscillations resulting from applying the
+      rectangular window obscured a formant (the one located at a
+      little more than half the Nyquist frequency).
+    </para>
+
+    <exercise id="exer2">
+      <problem id="id7011679">
+	<para id="p8">What might be the source of these oscillations?  To gain
+	  some insight, what is the 
+	  length-<m:math>
+	    <m:apply>
+	      <m:times/>
+	      <m:cn>2</m:cn>
+	      <m:ci>N</m:ci>
+	    </m:apply>
+	  </m:math> discrete Fourier transform of a
+	  length-<m:math><m:ci>N</m:ci></m:math> pulse?  The pulse
+	  emulates the rectangular window, and certainly has edges.
+	  Compare your answer with the 
+          length-<m:math>
+	    <m:apply>
+              <m:times/>
+	      <m:cn>2</m:cn>
+	      <m:ci>N</m:ci>
+            </m:apply>
+          </m:math> transform of
+	  a 
+          length-<m:math>
+            <m:ci>N</m:ci>
+          </m:math>
+	  Hanning window.
+	</para></problem>
+      <solution id="id7011733">
+	<para id="p9">
+	  The oscillations are due to the boxcar window's Fourier
+	  transform, which equals the sinc function.
+	</para>
+      </solution>
+    </exercise>
+
+    <figure id="fig1"><title>Non-overlapping windows</title><media id="id7011756" alt="">
+        <image src="../../media/sig19.png" mime-type="image/png"/>
+        <image for="pdf" src="../../media/sig19.eps" mime-type="application/postscript"/>
+      </media> 
+      
+    <caption>In comparison with the original speech segment shown in the
+	upper plot, the non-overlapped Hanning windowed version shown
+	below it is very ragged.  Clearly, spectral information
+	extracted from the bottom plot could well miss important
+	features present in the original.
+      </caption></figure>
+
+    <para id="p4">If you examine the windowed signal sections in sequence to
+      examine windowing's effect on signal amplitude, we see that we
+      have managed to amplitude-modulate the signal with the
+      periodically repeated window (<link target-id="fig1" strength="2"/>).  To alleviate this problem, frames are
+      overlapped (typically by half a frame duration).  This solution
+      requires more Fourier transform calculations than needed by
+      rectangular windowing, but the spectra are much better behaved
+      and spectral changes are much better captured.
+    </para><para id="p5">
+      The speech signal, such as shown in the <link target-id="spectrogram" strength="2">speech spectrogram</link>, is sectioned into
+      overlapping, equal-length frames, with a Hanning window applied
+      to each frame. The spectra of each of these is calculated, and
+      displayed in spectrograms with frequency extending vertically,
+      window time location running horizontally, and spectral
+      magnitude color-coded. <link target-id="fig3" strength="2"/>
+      illustrates these computations.
+    </para>
+
+    <figure id="fig3"><title>Overlapping windows for computing spectrograms</title><media id="id7040951" alt="">
+        <image src="../../media/sig20.png" mime-type="image/png"/>
+        <image for="pdf" src="../../media/sig20.eps" mime-type="application/postscript"/>
+      </media> 
+      
+    <caption>The original speech segment and the sequence of overlapping
+	Hanning windows applied to it are shown in the upper portion.
+	Frames were 256 samples long and a Hanning window was applied
+	with a half-frame overlap.  A length-512 FFT of each frame was
+	computed, with the magnitude of the first 257 FFT values
+	displayed vertically, with spectral amplitude values
+	color-coded.
+      </caption></figure>
+
+    <exercise id="exer3">
+      <problem id="id7040974">
+	<para id="p10">
+	  Why the specific values of 256 for 
+	  <m:math>
+	    <m:ci>N</m:ci>
+	  </m:math> and 512 for 
+	  <m:math>
+	    <m:ci>K</m:ci> </m:math>?  Another issue is how was the
+	  length-512 transform of each length-256 windowed frame
+	  computed?
+	</para>
+      </problem>
+      <solution id="id7040999">
+	<para id="p11">
+	  These numbers are powers-of-two, and the FFT algorithm can
+	  be exploited with these lengths.  To compute a longer
+	  transform than the input signal's duration, we simply
+	  zero-pad the signal.
+	</para>
+      </solution>
+    </exercise>
+
+  </content>
+</document>

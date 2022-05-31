@@ -1,0 +1,14 @@
+<col:collection xmlns="http://cnx.rice.edu/collxml" xmlns:col="http://cnx.rice.edu/collxml" xml:lang="en">
+  <metadata xmlns:md="http://cnx.rice.edu/mdml" mdml-version="0.5">
+    <md:content-id>col10476</md:content-id>
+    <md:title>Speech Signal Analysis</md:title>
+    <md:language>en</md:language>
+    <md:license url="http://creativecommons.org/licenses/by/2.0/">Creative Commons Attribution License</md:license>
+    <md:uuid>b7785f59-bfcd-4bc2-b749-141d1b2eba62</md:uuid>
+<md:slug>speech-signal-analysis</md:slug>
+</metadata>
+  <col:content>
+    <col:module document="m0049"/>
+    <col:module document="m0505"/>
+  </col:content>
+</col:collection>
